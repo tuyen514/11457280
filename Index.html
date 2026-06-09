@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>認識黎氏線互動遊戲</title>
+
+<style>
+body{
+    margin:0;
+    font-family:"Microsoft JhengHei",sans-serif;
+    height:100vh;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:linear-gradient(-45deg,#8B6B4A,#A67C52,#D2B48C,#F5F5DC,#FFFDF7);
+    background-size:400% 400%;
+    animation:bg 12s ease infinite;
+}
+
+@keyframes bg{
+    0%{background-position:0% 50%;}
+    50%{background-position:100% 50%;}
+    100%{background-position:0% 50%;}
+}
+
+.card{
+    width:800px;
+    max-width:90%;
+    background:rgba(255,255,255,0.9);
+    backdrop-filter:blur(15px);
+    padding:40px;
+    border-radius:25px;
+    color:#5C4033;
+    text-align:center;
+    box-shadow:0 10px 30px rgba(0,0,0,.2);
+}
+
+h1{
+    margin-bottom:10px;
+}
+
+#scoreBoard{
+    font-size:20px;
+    font-weight:bold;
+    margin-bottom:15px;
+    color:#6F4E37;
+}
+
+#intro{
+    color:#6F4E37;
+    line-height:1.8;
+    margin-bottom:20px;
+}
+
+button{
+    width:100%;
+    padding:15px;
+    margin-top:10px;
+    border:none;
+    border-radius:12px;
+    background:#8B6B4A;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+button:hover{
+    background:#6F4E37;
+    transform:translateY(-2px);
+}
+
+#result{
+    margin-top:20px;
+    font-size:28px;
+    font-weight:bold;
+    min-height:40px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h1>🎮 認識黎氏線互動遊戲</h1>
+
+<div id="scoreBoard">目前分數：0 分</div>
+
+<div id="intro"></div>
+
+<h2 id="question"></h2>
+
+<div id="choices"></div>
+
+<div id="result"></div>
+
+</div>
+
+<script>
+
+let score = 0;
+
+const introText = `
+👋 大家好！<br>
+我是黎氏線，來自越南 🇻🇳<br>
+我來台灣已經兩年多了。<br>
+因為喜歡學中文，而且姐姐在台灣，<br>
+所以我決定來台灣留學。<br><br>
+一起來挑戰小遊戲認識我吧！
+`;
+
+const story = {
+
+start:{
+text:"我來自哪一個國家？",
+choices:[
+{text:"越南",correct:true,next:"q2"},
+{text:"日本",correct:false,next:"q2"},
+{text:"韓國",correct:false,next:"q2"}
+]
+},
+
+q2:{
+text:"我來台灣多久了？",
+choices:[
+{text:"半年",correct:false,next:"q3"},
+{text:"一年",correct:false,next:"q3"},
+{text:"兩年多",correct:true,next:"q3"}
+]
+},
+
+q3:{
+text:"我為什麼來台灣？",
+choices:[
+{text:"工作",correct:false,next:"q4"},
+{text:"學中文",correct:true,next:"q4"},
+{text:"旅遊",correct:false,next:"q4"}
+]
+},
+
+q4:{
+text:"我學中文時覺得最難的是什麼？",
+choices:[
+{text:"發音",correct:false,next:"q5"},
+{text:"漢字",correct:true,next:"q5"},
+{text:"文法",correct:false,next:"q5"}
+]
+},
+
+q5:{
+text:"剛來台灣時，我最大的困難是什麼？",
+choices:[
+{text:"沒有朋友",correct:false,next:"end"},
+{text:"語言障礙",correct:true,next:"end"},
+{text:"天氣太熱",correct:false,next:"end"}
+]
+},
+
+end:{
+text:"🎉 恭喜完成挑戰！",
+end:true
+}
+
+};
+
+function startGame(){
+score = 0;
+
+document.getElementById("scoreBoard").innerText =
+"目前分數：0 分";
+
+document.getElementById("intro").innerHTML =
+introText;
+
+showScene("start");
+}
+
+function showScene(key){
+
+const scene = story[key];
+
+document.getElementById("question").innerText =
+scene.text;
+
+const choicesDiv =
+document.getElementById("choices");
+
+const resultDiv =
+document.getElementById("result");
+
+choicesDiv.innerHTML = "";
+resultDiv.innerHTML = "";
+
+if(scene.end){
+
+choicesDiv.innerHTML = `
+<p style="font-size:22px;">
+🎉 恭喜完成挑戰！<br><br>
+
+🏆 總分：${score} / 50 分<br><br>
+
+我是黎氏線 🇻🇳<br>
+來自越南<br>
+來台灣兩年多了<br>
+因為喜歡中文而來留學<br>
+目前努力學習中文中 💪
+</p>
+`;
+
+const btn = document.createElement("button");
+
+btn.innerText = "🔄 再玩一次";
+
+btn.onclick = () => startGame();
+
+choicesDiv.appendChild(btn);
+
+return;
+}
+
+scene.choices.forEach(c=>{
+
+const btn = document.createElement("button");
+
+btn.innerText = c.text;
+
+btn.onclick = ()=>{
+
+if(c.correct){
+score += 10;
+}
+
+document.getElementById("scoreBoard").innerText =
+`目前分數：${score} 分`;
+
+resultDiv.innerHTML = c.correct
+? "🎉 答對了！ (+10分)"
+: "😅 答錯了！";
+
+resultDiv.style.color = c.correct
+? "#16a34a"
+: "#dc2626";
+
+setTimeout(()=>{
+showScene(c.next);
+},1200);
+
+};
+
+choicesDiv.appendChild(btn);
+
+});
+
+}
+
+startGame();
+
+</script>
+
+</body>
+</html>
